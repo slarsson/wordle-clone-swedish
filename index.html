@@ -4,43 +4,54 @@
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" type="text/css" href="style.css" />
+
     <title>Wordle Clone Swedish</title>
   </head>
   <body>
     <div id="app"></div>
     <main>
-      <div id="grid">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+      <div class="grid-wrapper">
+        <div id="grid">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
       <div id="keyboard">
         <div>
@@ -70,7 +81,7 @@
           <button data-key="ä">ä</button>
         </div>
         <div>
-          <button data-key="_enter">enter</button>
+          <button data-key="Enter">ENTER</button>
           <button data-key="z">z</button>
           <button data-key="x">x</button>
           <button data-key="c">c</button>
@@ -78,7 +89,7 @@
           <button data-key="b">b</button>
           <button data-key="n">n</button>
           <button data-key="m">m</button>
-          <button data-key="_remove">remove</button>
+          <button data-key="Backspace">Remove</button>
         </div>
       </div>
     </main>

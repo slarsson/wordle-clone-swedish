@@ -1,5 +1,6 @@
 import './style.css';
 import { words } from './wordlist';
+import { Game, TileState, Tile } from './game';
 
 interface Elements {
   grid: Array<HTMLDivElement>;
@@ -7,7 +8,9 @@ interface Elements {
 }
 
 const hydrate = (keyboard: string, grid: string): Elements => {
-  let keyboardElement = document.getElementById(keyboard) as HTMLDivElement | null;
+  let keyboardElement = document.getElementById(
+    keyboard
+  ) as HTMLDivElement | null;
   if (!keyboardElement) {
     throw `missing element with id ${keyboard}`;
   }
@@ -34,10 +37,14 @@ const hydrate = (keyboard: string, grid: string): Elements => {
   };
 };
 
-window.addEventListener('DOMContentLoaded', () => {
+const main = () => {
   let h = hydrate('keyboard', 'grid');
 
-  const update = (index: number, value: string | null, type: TileState): void => {
+  const update = (
+    index: number,
+    value: string | null,
+    type: TileState
+  ): void => {
     let v = '';
     if (value) {
       v = value;
@@ -64,140 +71,34 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  let g = new State('fuska', words, update);
+  let g = new Game('fuska', words, update);
+
+  const onInput = (key: string) => {
+    switch (key) {
+      case 'Enter':
+        g.enter();
+        break;
+      case 'Backspace':
+        g.remove();
+        break;
+      default:
+        if (key.match(/[a-ö]/g)) {
+          g.input(key);
+        }
+    }
+  };
+
+  window.addEventListener('keydown', (evt: KeyboardEvent) => {
+    onInput(evt.key);
+  });
 
   for (let child of h.keyboard) {
-    console.log(child);
-    child.addEventListener('click', (evt: Event) => {
-      console.log(child.dataset['key']);
-
-      let v = child.dataset['key'];
-      if (v) {
-        switch (v) {
-          case '_enter':
-            g.enter();
-            break;
-          case '_remove':
-            g.remove();
-            break;
-          default:
-            g.input(v);
-        }
-      }
+    child.addEventListener('click', () => {
+      const key = child.dataset['key'];
+      if (!key) return;
+      onInput(key);
     });
   }
-});
+};
 
-enum TileState {
-  Empty = 0,
-  Input = 1,
-  Wrong = 2,
-  Correct = 3,
-  CorrectWrongPosition = 4,
-}
-
-interface Tile {
-  value: string;
-  type: TileState;
-}
-
-class State {
-  private word: string[] = [];
-  private words: Map<string, null> = new Map();
-  private tiles: Tile[] = [];
-  private onChange: (index: number, value: string | null, type: TileState) => void;
-
-  private cursor: number = 0;
-  private stack: number[] = [];
-
-  private isDone: boolean = false;
-
-  constructor(
-    word: string,
-    words: string[],
-    fn: (index: number, value: string | null, type: TileState) => void
-  ) {
-    this.onChange = fn;
-    for (let char of word) {
-      this.word.push(char);
-    }
-    for (let word of words) {
-      if (word.length != 5) {
-        throw `bad word: ${word}`;
-      }
-      this.words.set(word, null);
-    }
-    for (let i = 0; i < 30; i++) {
-      this.tiles.push({ value: '', type: TileState.Empty });
-    }
-  }
-
-  input(v: string) {
-    if (this.isDone || this.stack.length >= 5) {
-      return;
-    }
-    const index = this.cursor + this.stack.length;
-    this.tiles[index].value = v;
-    this.tiles[index].type = TileState.Input;
-    this.stack.push(index);
-    this.onChange(index, v, TileState.Input);
-  }
-
-  remove() {
-    if (this.isDone || this.stack.length == 0) {
-      return;
-    }
-    const index = this.stack.pop();
-    if (index === undefined) return;
-    this.tiles[index].value = '';
-    this.tiles[index].type = TileState.Empty;
-    this.onChange(index, '', TileState.Empty);
-  }
-
-  enter() {
-    if (this.isDone || this.stack.length != 5) {
-      return;
-    }
-    let word: string[] = [];
-    let wordAsString = '';
-    for (const index of this.stack) {
-      const value = this.tiles[index].value;
-      word.push(value);
-      wordAsString += value;
-    }
-
-    if (!this.words.has(wordAsString)) {
-      console.log('NOT FOUND TODO');
-      return;
-    }
-
-    for (let i = 0; i < 5; i++) {
-      const char = word[i];
-      const tile = this.tiles[this.stack[i]];
-
-      if (char == this.word[i]) {
-        tile.type = TileState.Correct;
-      } else if (this.word.includes(char)) {
-        tile.type = TileState.CorrectWrongPosition;
-      } else {
-        tile.type = TileState.Wrong;
-      }
-    }
-
-    let success = true;
-    for (const index of this.stack) {
-      const tile = this.tiles[index];
-      if (tile.type != TileState.Correct) {
-        success = false;
-      }
-      this.onChange(index, tile.value, tile.type);
-    }
-
-    this.cursor += 5;
-    this.stack = [];
-
-    if (this.cursor == 30 || success) {
-      this.isDone = true;
-    }
-  }
-}
+window.addEventListener('DOMContentLoaded', main);
